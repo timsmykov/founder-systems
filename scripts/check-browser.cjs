@@ -1,7 +1,7 @@
 /** Anonymous visitor check for the quoted hosted edition. No cookies or sign-in. */
 const {chromium}=require('playwright');
 const assert=require('assert/strict'),fs=require('fs');
-const BASE=process.env.ATLAS_BASE_URL||'https://nik-elon-mechanisms.timsmykov.chatgpt.site/';
+const BASE=process.env.ATLAS_BASE_URL||'https://founder-systems.timsmykov.chatgpt.site/';
 (async()=>{const b=await chromium.launch(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{});const checks=[];try{
  for(const width of [1440,375,320]){
   const c=await b.newContext({viewport:{width,height:1000},isMobile:width<500,hasTouch:width<500});const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(String(e)));
