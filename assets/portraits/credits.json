@@ -1,0 +1,36 @@
+{
+  "portraits": [
+    {
+      "person": "nik",
+      "source_page": "https://commons.wikimedia.org/wiki/File:2022_-_Centre_Stage_HM3_3918_(52472532046)_(cropped).jpg",
+      "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/89/2022_-_Centre_Stage_HM3_3918_%2852472532046%29_%28cropped%29.jpg",
+      "credit": "Harry Murphy / Web Summit via Sportsfile",
+      "license": "CC-BY-2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/",
+      "sha256": "a5ac79ed395a5d91d0f771a7192109dfbd350888574f5b0dec625b3d5b28f1dc",
+      "original_file": "nik-original.jpg",
+      "adapted_file": "nik.webp",
+      "adaptation": "AI-assisted background removal and tight head-and-shoulders crop; original photograph retained separately.",
+      "model": "gpt-image-2.5-sunburst",
+      "quality": "xhigh",
+      "adapted_sha256": "ae7351ecf362823b9b65802c4f977e8e4f7e1ef5fc3b1a645703fdcc7e200929",
+      "photographed_on": "2022-11-02"
+    },
+    {
+      "person": "elon",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Elon_Musk_(54816836217)_(cropped_close).jpg",
+      "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Elon_Musk_%2854816836217%29_%28cropped_close%29.jpg",
+      "credit": "Gage Skidmore",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sha256": "ef19f90d8bffd85d895a2a5b11ce19e977917e57ee0a2ad6532cc05412ec647f",
+      "original_file": "elon-original.jpg",
+      "adapted_file": "elon.webp",
+      "adaptation": "AI-assisted background removal and tight head-and-shoulders crop; original photograph retained separately.",
+      "model": "gpt-image-2.5-sunburst",
+      "quality": "xhigh",
+      "adapted_sha256": "bbe7d94e8c7f75a66dad7bf7380168b53096e8cf678a75f3727728f0cf002fd3",
+      "photographed_on": "2025-09-21"
+    }
+  ]
+}
