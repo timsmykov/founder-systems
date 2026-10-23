@@ -4,7 +4,7 @@ A source-backed map of how founders build and operate companies. The first colle
 
 Explore **783 meanings, 3,692 detailed facets and 249 reviewed comparison groups**, including 23 same-mechanism groups. All **5,098 original quotation records** remain included; 4,459 are attached to meaning cards and the remainder preserves audit/context evidence. The project name accommodates future founders; the current interface/data model still targets this first pair.
 
-[Open the interactive library](https://nik-elon-mechanisms.timsmykov.chatgpt.site/)
+[Open the interactive library](https://founder-systems.timsmykov.chatgpt.site/)
 
 ## Run locally
 
