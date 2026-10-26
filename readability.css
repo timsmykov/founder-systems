@@ -121,3 +121,8 @@
   .result-pane:fullscreen .results,.result-pane.graph-expanded .results{height:calc(100dvh - 160px)}
 }
 @media(min-width:761px) and (max-width:1100px) and (max-height:500px){.topbar{height:60px}.tabs,.tab{min-height:56px}.content{padding-top:10px}}
+
+/* The accepted interview increment uses the existing reading hierarchy. */
+.latest-update{margin:8px 0 0;font-size:16px;line-height:1.6}
+.latest-update a{text-decoration:underline;text-underline-offset:3px}
+.comparison-type.qualified_tension{background:var(--surface-soft);color:var(--ink);border:1px solid var(--line)}

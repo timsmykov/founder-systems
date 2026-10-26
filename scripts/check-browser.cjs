@@ -13,7 +13,7 @@ const BASE=process.env.ATLAS_BASE_URL||'https://founder-systems.timsmykov.chatgp
   assert.match(await p.locator('.repository-link').getAttribute('aria-label'),/Founder Systems/);
   const bounds=await p.locator('.repository-link').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=width+1,'GitHub link outside viewport');
   const data=await p.evaluate(()=>({cards:atlas.cards.size,relations:atlas.relations.size,quotations:atlas.counts.quotations,body:parseFloat(getComputedStyle(document.querySelector('.result-card p')).fontSize),heading:parseFloat(getComputedStyle(document.querySelector('.result-card h3')).fontSize),overflow:document.documentElement.scrollWidth-innerWidth}));
-  assert.equal(data.cards,783);assert.equal(data.relations,249);assert.equal(data.quotations,5098);assert(data.body>=(width<500?18:20));assert(data.heading>=(width<500?20:22));assert(data.overflow<=1);
+  const expected=await p.evaluate(()=>atlas.counts);assert.equal(data.cards,expected.meanings);assert.equal(data.relations,expected.comparisons);assert.equal(data.quotations,expected.quotations);assert(data.body>=(width<500?18:20));assert(data.heading>=(width<500?20:22));assert(data.overflow<=1);
   for(const theme of ['light','dark']){await p.locator('#theme-select').selectOption(theme);assert.equal(await p.locator('html').getAttribute('data-theme'),theme);}
   await p.locator('.result-card').first().click();await p.locator('.quote').first().waitFor();
   const literal=await p.locator('.quote').first().evaluate(async n=>{const [r]=await atlas.evidence([n.dataset.evidence]);return typeof r.original.text==='string'&&n.querySelector('blockquote')?.textContent===r.original.text;});assert(literal,'Original quotation missing or changed');

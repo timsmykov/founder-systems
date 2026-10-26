@@ -12,10 +12,12 @@ def verify():
     cards = {k: v for p in (ROOT / 'data/cards').glob('*.json') for k, v in read(p).items()}
     evidence = {k: v for p in (ROOT / 'data/evidence').glob('*.json') for k, v in read(p).items()}
     relations = read(ROOT / 'data/relations.json')['relations']
-    assert len(cards) == index['counts']['meanings'] == 783
-    assert len(evidence) == index['counts']['quotations'] == 5098
-    assert len(relations) == index['counts']['comparisons'] == 249
-    assert sum(len(c['original']['facets']) for c in cards.values()) == 3692
+    assert len(cards) == index['counts']['meanings']
+    assert len(evidence) == index['counts']['quotations']
+    assert len(relations) == index['counts']['comparisons']
+    assert sum(len(c['original']['facets']) + sum(len(s['facets']) for s in c.get('supplements',[])) for c in cards.values()) == index['counts']['facets']
+    assert sum(c['side']=='nik' for c in index['cards']) == index['counts']['nik']
+    assert sum(c['side']=='elon' for c in index['cards']) == index['counts']['elon']
     for row in evidence.values():
         assert isinstance(row['text'], str)
         if row.get('text_sha256'):
@@ -26,7 +28,7 @@ def verify():
         for keys in cards[card['id']]['facet_evidence'].values():
             assert set(keys) <= evidence.keys()
     for relation in relations:
-        for decision in relation['decisions']:
+        for decision in relation['decisions'] + relation.get('supplemental_decisions',[]):
             for side in ['nik', 'elon']:
                 for endpoint in decision[side]:
                     assert endpoint['idea_id'] in cards
@@ -38,7 +40,7 @@ def verify():
     tracked = [p for p in ROOT.rglob('*') if p.is_file() and not any(part in {'.git', 'node_modules'} for part in p.relative_to(ROOT).parts)]
     assert not any(p.suffix in forbidden for p in tracked)
     assert not any(p.name in {'checkpoint.json', 'resume-packet.json'} for p in tracked)
-    print('Verified: 783 meanings, 3692 facets, 249 comparisons and 5098 literal quotation records.')
+    print('Verified:', json.dumps(index['counts'],sort_keys=True))
 
 
 if __name__ == '__main__':
