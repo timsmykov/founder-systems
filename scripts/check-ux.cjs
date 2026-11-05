@@ -17,6 +17,8 @@ module.exports = async function checkUX(page, base) {
       const [row] = await atlas.evidence([n.dataset.evidence]);
       return n.querySelector('blockquote')?.textContent === row.original.text;
     }), 'Quotation changed');
+    assert.deepEqual(await page.locator('#reader').evaluate(n => [...n.querySelectorAll(':scope > .detail-section[id]')].map(x => x.id)),
+      ['card-quotes','meaning-details','card-connections']);
     out.push({width,height,resultHeight:Math.round(result.height)});
   }
   await page.goto(base);
@@ -31,6 +33,10 @@ module.exports = async function checkUX(page, base) {
   await page.locator('.comparison-explainer').waitFor();
   const comparisonURL=page.url();
   await page.goto(comparisonURL); await page.locator('.comparison-explainer').waitFor();
+  await page.locator('#relation-nik-quotes .quote').first().waitFor();
+  await page.locator('#relation-elon-quotes .quote').first().waitFor();
+  const sections = await page.locator('#reader > .detail-section > h3').allTextContents();
+  assert(sections.indexOf('Where the approaches differ') < sections.indexOf('Evidence from both collections'), 'Comparison evidence hierarchy changed');
   assert(await page.locator('#reader').evaluate(n => n.classList.contains('mobile-open')));
   await page.locator('.back-button').click(); await page.waitForTimeout(300);
   await page.locator('#graph-tab').click();
