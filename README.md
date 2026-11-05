@@ -6,6 +6,18 @@ Explore **793 meanings, 3,822 detailed facets and 257 comparison groups**, inclu
 
 [Open the interactive library](https://founder-systems.timsmykov.chatgpt.site/)
 
+![Founder Systems interactive library](assets/portfolio-preview.png)
+
+## Project and authorship
+
+**Created by Tim Smykov using AI-assisted research and development.** My work spans the research question, evidence structure, comparison model, interactive product and verification process. The founders, source authors and quoted speakers retain authorship of their ideas and words; the comparison and presentation are my editorial work.
+
+The question behind the project is practical: how can you explore recurring company-building mechanisms without flattening different sources into a list of slogans? Meaning cards preserve conditions and detailed facets; comparison groups describe the relationship rather than assuming that similar wording implies the same mechanism.
+
+Start with a topic or search, open a meaning card to inspect its quotations, then use the graph and comparison groups to explore related ideas. The public application runs entirely in the browser. This is an exploratory research product, not a validated theory of company performance or an endorsement of any founder's conduct.
+
+Read the [product case study](docs/case-study.md) for the design decisions and evidence boundaries.
+
 ## Run locally
 
 ```sh
