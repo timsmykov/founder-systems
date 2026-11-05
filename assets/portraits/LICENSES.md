@@ -14,7 +14,7 @@ Both display portraits use AI-assisted background removal and a tight head-and-s
 
 ## Upcoming founder portraits
 
-These previews use the photographs listed below. Display images may be cropped and most use AI-assisted background removal; no endorsement is implied.
+These previews use the photographs listed below. Display images may be cropped and most use AI-assisted background removal; no endorsement is implied. The smaller files in `preview/` are resized, WebP-encoded versions of these display images and inherit the applicable terms below.
 
 - **Steve Jobs:** photograph by Matthew Yohe, crop by MetalGearLiquid, [source](https://commons.wikimedia.org/wiki/File:Steve_Jobs_Headshot_2010-CROP2.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). The adapted portrait is also offered under CC BY-SA 3.0.
 - **Jensen Huang:** photograph by Anderseidesvik, [source](https://commons.wikimedia.org/wiki/File:Jensen_huang_stanford_2026-04-30_010.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The adapted portrait is also offered under CC BY-SA 4.0.

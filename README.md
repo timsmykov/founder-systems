@@ -14,7 +14,7 @@ Explore **793 meanings, 3,822 detailed facets and 257 comparison groups**, inclu
 
 The question behind the project is practical: how can you explore recurring company-building mechanisms without flattening different sources into a list of slogans? Meaning cards preserve conditions and detailed facets; comparison groups describe the relationship rather than assuming that similar wording implies the same mechanism.
 
-Start with a topic or search, open a meaning card to inspect its quotations, then use the graph and comparison groups to explore related ideas. The public application runs entirely in the browser. This is an exploratory research product, not a validated theory of company performance or an endorsement of any founder's conduct.
+Start with a topic or search, open an idea to inspect its quotations, then use Compare to read reviewed relationships and their limits. The graph initially shows a small sample of matching comparisons; choose “Show all” to expand it. Upcoming founders are previews rather than available collections. The public application runs entirely in the browser. This is an exploratory research product, not a validated theory of company performance or an endorsement of any founder's conduct.
 
 Read the [product case study](docs/case-study.md) for the design decisions and evidence boundaries. Explore [Founder Lenses](https://github.com/timsmykov/founder-lenses) for source-aware agent skills derived from this research.
 
@@ -38,6 +38,7 @@ Optional browser checks:
 npm install
 npx playwright install chromium
 ATLAS_BASE_URL=http://localhost:8080/ npm run test:browser
+ATLAS_BASE_URL=http://localhost:8080/ node scripts/check-ux.cjs
 ```
 
 The repository contains the selected quoted library and its interface with a new Git history. Full book/transcript source files, native worker packets and research execution history remain in a separate private research archive. `export-verification.json` and `release-manifest.json` bind the exported records to their source snapshot and file hashes.

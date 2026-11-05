@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normal = value => String(value ?? '').toLocaleLowerCase().normalize('NFKC').replace(/ё/g,'е').replace(/\s+/g,' ');
 const TYPES = {same_mechanism:'Same mechanism',partial_overlap:'Partial overlap',same_goal_different_methods:'Same goal, different methods',complement:'Complement',insufficient_evidence:'Insufficient evidence',qualified_tension:'Qualified tension'};
+const TYPE_HELP = {same_mechanism:'The sources describe the same underlying mechanism, subject to the recorded conditions.',partial_overlap:'The sources overlap in part; their approaches are not identical.',same_goal_different_methods:'The sources share a goal but describe different methods.',complement:'The sources describe approaches that may complement each other.',insufficient_evidence:'The available evidence is not enough to establish a stronger relationship.',qualified_tension:'The sources appear to differ under the recorded conditions; this is not a blanket contradiction.'};
 const VOICES = {nik:'Nik Storonsky',nik_context_inferred:'Nik Storonsky · caption attribution',institutional_quantumlight:'QuantumLight · institutional',musk_via_book:'Elon Musk · via the book',editor:'Book editor',naval:'Naval Ravikant',naval_foreword:'Naval Ravikant · foreword',interviewer:'Interviewer',unknown:'Uncertain speaker'};
 const RU = {'найм':['hiring','recruit','talent'],'наним':['hiring','recruit'],'люд':['people','team','talent'],'команд':['team'],'культур':['culture','values'],'ценност':['values'],'цел':['goals','objectives'],'метрик':['metrics'],'результат':['performance','results'],'мотивац':['incentive','motivation'],'обратн':['feedback'],'продукт':['product'],'рост':['growth','scaling'],'масштаб':['scaling','scale'],'стратег':['strategy'],'деньг':['money','capital'],'капитал':['capital'],'рис':['risk'],'решени':['decision'],'мышлен':['reasoning','thinking'],'обучен':['learning'],'ошиб':['failure','mistake'],'инженер':['engineer'],'скорост':['speed'],'процесс':['process'],'управл':['management','leadership'],'делег':['delegation'],'ответствен':['accountability','ownership']};
 const PAGE = 24;
@@ -12,7 +13,7 @@ const cache = new Map();
 const graphCamera = new GraphCamera();
 let graphController = null;
 let s = {view:'meanings',topic:'all',author:'all',filter:'all',q:'',selected:null,kind:null,page:0};
-let renderToken = 0, searchTimer, focusGraph = false, currentItems = [], lastFocused;
+let renderToken = 0, searchTimer, focusGraph = false, fullGraph = false, currentItems = [], lastFocused;
 const phoneMedia = matchMedia('(max-width:760px), (max-width:1100px) and (max-height:500px)');
 const filterHome = document.createComment('Desktop filter position');
 $('filter-row').before(filterHome);
@@ -70,18 +71,18 @@ function navMarkup(){
 }
 function syncControls(){
   $('topics').innerHTML=$('mobile-topics').innerHTML=navMarkup();
-  const t=topicById.get(s.topic);$('page-title').textContent=t?t.name:'Company-building ideas.';
-  $('page-description').textContent=t?t.title:`${cards.length} meanings across two source collections.`;
+  const t=topicById.get(s.topic);$('page-title').textContent=t?t.name:'How founders build companies.';
+  $('page-description').textContent=t?t.title:'Explore source-backed ideas, original quotations and carefully qualified comparisons.';
   if($('search').value!==s.q)$('search').value=s.q;
   document.querySelectorAll('[data-view]').forEach(b=>{const on=b.dataset.view===s.view;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.setAttribute('aria-controls','explorer');b.tabIndex=on?0:-1;});
   $('explorer').setAttribute('aria-labelledby',s.view+'-tab');
   document.querySelectorAll('[data-author]').forEach(b=>{const on=b.dataset.author===s.author;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
-  const options=s.view==='comparisons'?['<option value="all">All comparison types</option>',...Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${esc(v)} (${index.relation_counts[k]||0})</option>`)]:['<option value="all">All meanings</option>','<option value="linked">With a comparison</option>','<option value="unlinked">No established comparison</option>','<option value="unresolved">Unresolved</option>'];
+  const options=s.view==='comparisons'?['<option value="all">All comparison types</option>',...Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${esc(v)} (${index.relation_counts[k]||0})</option>`)]:['<option value="all">All ideas</option>','<option value="linked">With a comparison</option>','<option value="unlinked">No established comparison</option>','<option value="unresolved">Unresolved</option>'];
   $('status-filter').innerHTML=options.join('');$('status-filter').value=[...$('status-filter').options].some(o=>o.value===s.filter)?s.filter:'all';
   document.querySelector('.author-filter').hidden=s.view==='comparisons';
   $('content').classList.toggle('graph-mode',s.view==='graph');$('content').classList.toggle('has-selection',!!s.selected);
   ['graph-intro','graph-tools','graph-legend'].forEach(id=>$(id).hidden=s.view!=='graph');
-  document.querySelector('#graph-intro p').textContent=phone()?'Pinch to zoom. Tap a point to preview.':'Pinch to zoom; drag or scroll to pan.';
+  document.querySelector('#graph-intro p').textContent=phone()?'A sample of matching comparisons. Tap a point to preview; use Ideas for a list.':'A sample of matching comparisons. Select a point; use Ideas for a list.';
   $('graph-focus').disabled=!s.selected||s.kind!=='meaning';$('graph-focus').textContent=focusGraph?'Show full view':'Focus selected idea';
   const active=Number(s.author!=='all')+Number(s.filter!=='all');
   $('filter-badge').hidden=!active;$('filter-badge').textContent=active;
@@ -89,6 +90,7 @@ function syncControls(){
   $('mobile-reset').hidden=!(active||s.topic!=='all'||s.q);
   $('search-clear').hidden=!s.q;
   $('status-label').classList.toggle('sr-only',!phone());
+  if(!s.selected){const h=$('reader').querySelector('.reader-empty h2'),p=$('reader').querySelector('.reader-empty>p');if(h&&p){h.textContent=s.view==='comparisons'?'Choose a comparison.':'Choose an idea to start.';p.textContent=s.view==='comparisons'?'See where the sources overlap or differ, with evidence and limits for each comparison.':'Explore an idea, read its original quotations, and follow a comparison where one has been reviewed.';}}
   renderGraphSelection();
 }
 function renderGraphSelection(){
@@ -98,22 +100,23 @@ function renderGraphSelection(){
 }
 function renderList(){
   currentItems=filtered();const total=currentItems.length,isRel=s.view==='comparisons';
-  $('result-count').textContent=`${total.toLocaleString()} ${isRel?'comparisons':'meanings'}${s.topic==='all'?'':' in this topic'}`;
-  $('sort-note').textContent=s.view==='graph'?'All matching records':s.q?'Matching your search':'Reading order';
+  $('result-count').textContent=`${total.toLocaleString()} ${isRel?'comparisons':'ideas'}${s.topic==='all'?'':' in this topic'}`;
+  $('sort-note').textContent=s.view==='graph'?'Matching connections':s.q?'Matching your search':'Reading order';
   $('results').setAttribute('aria-busy','false');
-  $('filters-done').textContent=`Show ${total.toLocaleString()} ${isRel?'comparisons':'meanings'}`;
+  $('filters-done').textContent=`Show ${total.toLocaleString()} ${isRel?'comparisons':'ideas'}`;
   $('search-clear').hidden=!s.q;
   if(s.view==='graph'){renderGraph(currentItems);$('pagination').innerHTML='';return;}
   const pages=Math.max(1,Math.ceil(total/PAGE));s.page=Math.min(s.page,pages-1);
   const visible=currentItems.slice(s.page*PAGE,(s.page+1)*PAGE);
+  const upcoming=['Steve Jobs','Jensen Huang','Dario Amodei','Jeff Bezos','Patrick Collison','Peter Thiel','Garry Tan','Daniel Ek','Tobi Lütke','Paul Graham'].filter(name=>s.q&&normal(name).includes(normal(s.q).trim()));
   $('results').innerHTML=visible.length?visible.map(item=>{
     if(isRel){return `<button class="result-card ${s.selected===item.id?'active':''}" data-select-relation="${item.id}" aria-pressed="${s.selected===item.id}"><div class="card-topline">${pill(item.relation)}<span class="mini-arrow" aria-hidden="true">↗</span></div><h3>${esc(item.title)}</h3><p>${esc(item.decisions[0].mechanism)}</p><div class="card-meta"><span>${esc(topicById.get(item.topic_ids[0])?.name||'Comparison')}</span><span>·</span><span>Both source collections</span></div></button>`;}
     return `<button class="result-card ${s.selected===item.id?'active':''}" data-select-meaning="${esc(item.id)}" aria-pressed="${s.selected===item.id}"><div class="card-topline">${sourceMark(item.side)}${esc(label(item))}<span class="mini-arrow" aria-hidden="true">↗</span></div><h3>${esc(item.title)}</h3><p>${esc(item.statement)}</p><div class="card-meta"><span>${item.facet_count} details</span><span>·</span><span>${item.evidence_keys.length} quotations</span>${item.links.length?`<span class="link-count">↔ ${item.links.length} comparisons</span>`:''}</div></button>`;
-  }).join(''):`<div class="empty-results"><h3>No matches in this view.</h3><p>Try fewer words, another source, or all topics. Search includes original quotations in both languages.</p><button class="secondary-button" data-action="reset">Clear filters</button></div>`;
+  }).join(''):`<div class="empty-results"><h3>No matches in this view.</h3><p>${upcoming.length?`${esc(upcoming.join(', '))} ${upcoming.length===1?'is':'are'} coming soon; ${upcoming.length===1?'this collection is':'these collections are'} not available yet.`:'Try fewer words, another source, or all topics. Search includes original quotations in both languages.'}</p><button class="secondary-button" data-action="reset">Clear filters</button></div>`;
   $('pagination').innerHTML=total?`<span>${s.page*PAGE+1}–${Math.min((s.page+1)*PAGE,total)} of ${total}</span><div><button data-page="prev" ${s.page===0?'disabled':''}>← Previous</button><button data-page="next" ${s.page>=pages-1?'disabled':''}>Next →</button></div>`:'';
 }
 function render(){syncControls();renderList();route();}
-function isolateReading(on){document.querySelectorAll('.topbar,.sidebar,.library-heading,.mobile-actions,.search-wrap,.search-label,.toolbar,.filter-row,.result-pane,.load-status,.skip-link').forEach(node=>node.inert=on);}
+function isolateReading(on){document.querySelectorAll('.topbar,.sidebar,.library-heading,.latest-update,.upcoming-founder,.mobile-actions,.search-wrap,.search-label,.toolbar,.filter-row,.result-pane,.load-status,.skip-link').forEach(node=>node.inert=on);}
 function closeReader(){
   const reader=$('reader'),wasOpen=reader.classList.contains('mobile-open');reader.classList.remove('mobile-open');reader.removeAttribute('role');reader.removeAttribute('aria-modal');document.body.classList.remove('mobile-reading');isolateReading(false);
   if(wasOpen){window.scrollTo(0,listScroll);const origin=readerOriginRecord&&document.querySelector(`[data-select-${readerOriginRecord.kind}="${CSS.escape(readerOriginRecord.id)}"]`);const target=origin||(lastFocused?.isConnected?lastFocused:$('results'));target.focus({preventScroll:true});readerOrigin=null;readerOriginRecord=null;}
@@ -174,19 +177,21 @@ function bullets(items){return items?.length?`<ul class="bullet-list">${items.ma
 async function renderRelation(id,token){
   const r=relationById.get(id),d=r.decisions[0];if(token!==renderToken)return;
   const endpoints=side=>[...new Set(r.decisions.flatMap(x=>x[side].map(e=>e.idea_id)))];
-  $('reader').innerHTML=readerBar(r.increment?'Interview comparison · single reader':'A reviewed comparison')+pill(r.relation)+`<h2 class="detail-title" style="margin-top:14px">${esc(r.title)}</h2><p class="detail-statement">${esc(d.mechanism)}</p><div class="detail-topics">${r.topic_ids.map(t=>`<button class="topic-chip" data-topic="${t}">${esc(topicById.get(t).name)}</button>`).join('')}</div><div class="relation-action"><span class="eyebrow">THE COMPARED ACTION</span><p>${esc(d.action)}</p></div><div class="two-sides">${['nik','elon'].map(side=>`<section class="side-evidence"><h3 class="section-title">${sourceMark(side)}${side==='nik'?'Nik / QuantumLight':'Elon · via the book'}</h3>${endpoints(side).map(i=>`<button class="endpoint-button" data-select-meaning="${esc(i)}">${esc(cardById.get(i).title)} ↗</button>`).join('')}<div id="relation-${side}-quotes"></div></section>`).join('')}</div><section class="detail-section"><h3 class="section-title">Conditions & limits</h3>${bullets(d.conditions)}</section><section class="detail-section"><h3 class="section-title">Where the approaches differ</h3>${bullets(d.differences)}</section>${d.counterevidence?.length?`<section class="detail-section"><h3 class="section-title">Counterevidence & qualifications</h3>${bullets(d.counterevidence)}</section>`:''}<details class="detail-disclosure"><summary>Attribution & review status</summary><p>${esc(d.attribution_notes||d.attribution||'Source voices remain attached to each original quotation.')}</p><p>${esc(d.independence_notes||d.independence||'Different publications do not establish independent corroboration.')}</p><p>${esc(typeof d.independent_review?.reason==='string'?d.independent_review.reason:JSON.stringify(d.independent_review||{}))}</p><p>Record: ${esc(r.id)}</p><p>${esc(r.interpretation)}</p></details>${r.decisions.length>1?`<details class="detail-disclosure"><summary>All ${r.decisions.length} retained review variants</summary>${r.decisions.map(x=>`<h3 class="section-title">${esc(x.title)}</h3><p>${esc(x.action)}</p><p>${esc(x.mechanism)}</p>${bullets(x.conditions)}${bullets(x.differences)}${bullets(x.counterevidence)}`).join('')}</details>`:''}`;
+  $('reader').innerHTML=readerBar(r.increment?'Interview comparison · single reader':'A reviewed comparison')+pill(r.relation)+`<p class="comparison-explainer">${esc(TYPE_HELP[r.relation]||'See the evidence and qualifications below.')}</p><h2 class="detail-title" style="margin-top:14px">${esc(r.title)}</h2><p class="detail-statement">${esc(d.mechanism)}</p><div class="detail-topics">${r.topic_ids.map(t=>`<button class="topic-chip" data-topic="${t}">${esc(topicById.get(t).name)}</button>`).join('')}</div><div class="relation-action"><span class="eyebrow">THE COMPARED ACTION</span><p>${esc(d.action)}</p></div><div class="two-sides">${['nik','elon'].map(side=>`<section class="side-evidence"><h3 class="section-title">${sourceMark(side)}${side==='nik'?'Nik / QuantumLight':'Elon · via the book'}</h3>${endpoints(side).map(i=>`<button class="endpoint-button" data-select-meaning="${esc(i)}">${esc(cardById.get(i).title)} ↗</button>`).join('')}<div id="relation-${side}-quotes"></div></section>`).join('')}</div><section class="detail-section"><h3 class="section-title">Conditions & limits</h3>${bullets(d.conditions)}</section><section class="detail-section"><h3 class="section-title">Where the approaches differ</h3>${bullets(d.differences)}</section>${d.counterevidence?.length?`<section class="detail-section"><h3 class="section-title">Counterevidence & qualifications</h3>${bullets(d.counterevidence)}</section>`:''}<details class="detail-disclosure"><summary>Attribution & review status</summary><p>${esc(d.attribution_notes||d.attribution||'Source voices remain attached to each original quotation.')}</p><p>${esc(d.independence_notes||d.independence||'Different publications do not establish independent corroboration.')}</p><p>${esc(typeof d.independent_review?.reason==='string'?d.independent_review.reason:JSON.stringify(d.independent_review||{}))}</p><p>Record: ${esc(r.id)}</p><p>${esc(r.interpretation)}</p></details>${r.decisions.length>1?`<details class="detail-disclosure"><summary>All ${r.decisions.length} retained review variants</summary>${r.decisions.map(x=>`<h3 class="section-title">${esc(x.title)}</h3><p>${esc(x.action)}</p><p>${esc(x.mechanism)}</p>${bullets(x.conditions)}${bullets(x.differences)}${bullets(x.counterevidence)}`).join('')}</details>`:''}`;
   await Promise.all(['nik','elon'].map(side=>showQuotes(r.decisions.flatMap(x=>x[side].flatMap(e=>e.evidence_keys)),`relation-${side}-quotes`,{limit:2})));
 }
 function renderGraph(items){
   let nodes=items;let ids=new Set(nodes.map(c=>c.id));let rs=relations.filter(r=>r.endpoint_ids.every(id=>ids.has(id)));
   if(focusGraph&&s.kind==='meaning'&&s.selected){rs=relations.filter(r=>r.endpoint_ids.includes(s.selected));ids=new Set([s.selected,...rs.flatMap(r=>r.endpoint_ids)]);nodes=cards.filter(c=>ids.has(c.id));}
+  const available=rs.length; if(!fullGraph&&!focusGraph&&rs.length>12){rs=rs.slice(0,12);ids=new Set(rs.flatMap(r=>r.endpoint_ids));nodes=nodes.filter(c=>ids.has(c.id));}
+  $('graph-scope').textContent=fullGraph?'Show a smaller map':`Show all ${available} comparisons`; $('graph-scope').hidden=available<=12&&!fullGraph;
   const W=1000,H=760,positions=new Map();
-  for(const side of ['nik','elon']){const group=nodes.filter(c=>c.side===side);const cols=side==='nik'?17:13;group.forEach((c,i)=>{const rows=Math.max(1,Math.ceil(group.length/cols));positions.set(c.id,{x:(side==='nik'?35:710)+(i%cols)*(side==='nik'?16:20),y:80+Math.floor(i/cols)*Math.min(27,610/rows)});});}
-  const hubs=new Map(rs.map((r,i)=>[r.id,{x:425+(i%8)*20,y:80+Math.floor(i/8)*Math.min(25,610/Math.max(1,Math.ceil(rs.length/8)))}]));
+  for(const side of ['nik','elon']){const group=nodes.filter(c=>c.side===side);const cols=fullGraph?(side==='nik'?17:13):Math.min(4,Math.max(1,Math.ceil(Math.sqrt(group.length))));group.forEach((c,i)=>{const rows=Math.max(1,Math.ceil(group.length/cols));positions.set(c.id,{x:(side==='nik'?35:710)+(i%cols)*(fullGraph?(side==='nik'?16:20):65),y:80+Math.floor(i/cols)*Math.min(fullGraph?27:105,610/rows)});});}
+  const hubs=new Map(rs.map((r,i)=>[r.id,{x:425+(i%(fullGraph?8:3))*(fullGraph?20:55),y:80+Math.floor(i/(fullGraph?8:3))*Math.min(fullGraph?25:105,610/Math.max(1,Math.ceil(rs.length/(fullGraph?8:3))))}]));
   let lines='';for(const r of rs){const h=hubs.get(r.id);for(const id of r.endpoint_ids){const p=positions.get(id);if(p)lines+=`<line x1="${p.x}" y1="${p.y}" x2="${h.x}" y2="${h.y}" data-edge-for="${r.id}"/>`;}}
-  let circles=nodes.map(c=>{const p=positions.get(c.id);return `<a href="#" data-node="${esc(c.id)}" aria-label="${esc(c.title)}"><circle class="node ${c.links.length?'':'isolated'} ${s.selected===c.id?'selected':''}" data-graph-node="${esc(c.id)}" cx="${p.x}" cy="${p.y}" r="${focusGraph?6:4}" fill="${c.side==='nik'?'var(--nik)':'var(--elon)'}"/></a>`;}).join('');
-  let hubNodes=rs.map(r=>{const p=hubs.get(r.id);return `<a href="#" data-hub="${r.id}" aria-label="${esc(r.title)}"><circle class="hub" data-graph-hub="${r.id}" cx="${p.x}" cy="${p.y}" r="3"/></a>`;}).join('');
-  $('results').innerHTML=nodes.length?`<svg class="network" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="${phone()?'xMidYMin meet':'xMidYMid meet'}" role="group" aria-label="${nodes.length} meanings and ${rs.length} reviewed comparison groups. Left: Nik and QuantumLight. Right: the Elon book collection. Central points represent comparisons."><text class="network-label" x="35" y="40">Nik / QuantumLight · ${nodes.filter(c=>c.side==='nik').length}</text><text class="network-label" x="425" y="40">${rs.length} comparisons</text><text class="network-label" x="710" y="40">Elon collection · ${nodes.filter(c=>c.side==='elon').length}</text><g id="graph-layer">${lines}${hubNodes}${circles}</g></svg>`:'<div class="graph-empty">No ideas match these filters. Clear filters to see the complete graph.</div>';
+  let circles=nodes.map(c=>{const p=positions.get(c.id);return `<a href="#" data-node="${esc(c.id)}" aria-label="${esc(c.title)}"><circle class="node ${c.links.length?'':'isolated'} ${s.selected===c.id?'selected':''}" data-graph-node="${esc(c.id)}" cx="${p.x}" cy="${p.y}" r="${focusGraph||!fullGraph?9:4}" fill="${c.side==='nik'?'var(--nik)':'var(--elon)'}"/></a>`;}).join('');
+  let hubNodes=rs.map(r=>{const p=hubs.get(r.id);return `<a href="#" data-hub="${r.id}" aria-label="${esc(r.title)}"><circle class="hub" data-graph-hub="${r.id}" cx="${p.x}" cy="${p.y}" r="${fullGraph?3:7}"/></a>`;}).join('');
+  $('results').innerHTML=nodes.length?`<svg class="network" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="${phone()?'xMidYMin meet':'xMidYMid meet'}" role="group" aria-label="${nodes.length} meanings and ${rs.length} reviewed comparison groups. Left: Nik and QuantumLight. Right: the Elon book collection. Central points represent comparisons."><text class="network-label" x="35" y="40">Nik / QuantumLight · ${nodes.filter(c=>c.side==='nik').length}</text><text class="network-label" x="425" y="40">${rs.length} comparisons</text><text class="network-label" x="710" y="40">Elon collection · ${nodes.filter(c=>c.side==='elon').length}</text><g id="graph-layer">${lines}${hubNodes}${circles}</g></svg>`:'<div class="graph-empty">No connected ideas match these filters. Try another topic or search.</div>';
   graphController?.destroy();const svg=$('results').querySelector('.network');if(svg){
     graphController=bindGraphCamera(svg,$('graph-layer'),graphCamera,{onChange:c=>{$('graph-zoom-value').textContent=Math.round(c.scale*100)+'%';},onMove:hideGraphTooltip});
     // Pick the nearest point in screen pixels: small SVG dots are not finger-sized targets.
@@ -196,11 +201,11 @@ function renderGraph(items){
       if(node)select(node.dataset.graphNode||node.dataset.graphHub,node.dataset.graphNode?'meaning':'relation',{open:false,push:false});
     });
   }
-  $('result-count').textContent=`${nodes.length} meanings · ${rs.length} comparisons`;
+  $('result-count').textContent=`${nodes.length} ideas · ${rs.length} of ${available} comparisons${!fullGraph&&available>12?' shown':''}`;
 }
-function filterChanged(){s.page=0;focusGraph=false;graphCamera.fit();closeReader();s.selected=null;s.kind=null;renderToken++;$('reader').innerHTML=emptyReader;render();$('results').scrollTop=0;}
+function filterChanged(){s.page=0;focusGraph=false;fullGraph=false;graphCamera.fit();closeReader();s.selected=null;s.kind=null;renderToken++;$('reader').innerHTML=emptyReader;render();$('results').scrollTop=0;}
 function setTopic(topic){s.topic=topic;s.selected=null;s.kind=null;filterChanged();$('topic-dialog').close();}
-function reset(){s={view:'meanings',topic:'all',author:'all',filter:'all',q:'',selected:null,kind:null,page:0};filterChanged();}
+function reset(){s={view:s.view,topic:'all',author:'all',filter:'all',q:'',selected:null,kind:null,page:0};filterChanged();}
 document.addEventListener('click',async e=>{
   const b=e.target.closest('button,a');if(!b)return;
   if(b.dataset.jump){$(b.dataset.jump)?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return;}
@@ -239,6 +244,7 @@ $('filters-done').addEventListener('click',()=>$('filters-dialog').close());
 $('mobile-about').addEventListener('click',()=>{$('filters-dialog').close();$('about-dialog').showModal();});
 $('topic-open').addEventListener('click',()=>$('topic-dialog').showModal());
 $('about-open').addEventListener('click',()=>$('about-dialog').showModal());
+$('graph-scope').addEventListener('click',()=>{fullGraph=!fullGraph;focusGraph=false;graphCamera.fit();renderList();});
 $('graph-zoom-in').addEventListener('click',()=>graphController?.zoom(1.25));
 $('graph-zoom-out').addEventListener('click',()=>graphController?.zoom(0.8));
 $('graph-fit').addEventListener('click',()=>graphController?.fit());
@@ -289,3 +295,6 @@ async function init(){
 init();
 
 document.querySelector('.tabs').addEventListener('keydown',e=>{const buttons=[...document.querySelectorAll('[data-view]')];let i=buttons.indexOf(e.target);if(i<0)return;if(e.key==='ArrowRight')i=(i+1)%buttons.length;else if(e.key==='ArrowLeft')i=(i+buttons.length-1)%buttons.length;else if(e.key==='Home')i=0;else if(e.key==='End')i=buttons.length-1;else return;e.preventDefault();buttons[i].click();buttons[i].focus();});
+
+// Load upcoming portraits only when the visitor opens the collection preview.
+document.querySelector('.upcoming-founder').addEventListener('toggle', e=>{if(e.currentTarget.open)e.currentTarget.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});});
