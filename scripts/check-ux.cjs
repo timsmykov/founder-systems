@@ -6,13 +6,24 @@ module.exports = async function checkUX(page, base) {
   const out = [];
   for (const [width,height] of [[1366,768],[1440,900],[1920,1080],[768,1024],[390,844]]) {
     await page.setViewportSize({width,height});
+    if (width === 390) await page.route('**/data/evidence/**', async route => { await new Promise(resolve => setTimeout(resolve, 1200)); await route.continue(); });
     await page.goto(base);
     await page.waitForFunction(() => window.atlas?.quoteSearchReady, {timeout:60000});
     const result = await page.locator('#results').boundingBox();
     assert(result.height >= 200, `Results collapsed at ${width}x${height}`);
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Horizontal overflow at ${width}`);
     await page.locator('.result-card').first().click();
+    if (width === 390) {
+      await page.locator('.detail-title').waitFor();
+      assert(await page.locator('.back-button').evaluate(n => n === document.activeElement), 'Reader lost focus while evidence loaded');
+      await page.locator('[data-jump="meaning-details"]').focus();
+    }
     await page.locator('.quote').first().waitFor();
+    if (width === 390) {
+      await page.waitForTimeout(100);
+      assert(await page.locator('[data-jump="meaning-details"]').evaluate(n => n === document.activeElement), 'Reader stole focus after evidence loaded');
+      await page.unroute('**/data/evidence/**');
+    }
     assert(await page.locator('.quote').first().evaluate(async n => {
       const [row] = await atlas.evidence([n.dataset.evidence]);
       return n.querySelector('blockquote')?.textContent === row.original.text;
@@ -60,6 +71,7 @@ module.exports = async function checkUX(page, base) {
   await page.waitForFunction(() => window.atlas?.quoteSearchReady, {timeout:60000});
   await page.locator('#meanings-tab').click();
   await page.locator('details.upcoming-founder summary').click();
+  await page.waitForFunction(() => document.querySelectorAll('.upcoming-founder img[src]').length === 10);
   assert.equal(await page.locator('.upcoming-founder img[src]').count(),10);
   for (const theme of ['light','dark']) {
     await page.locator('#theme-select').selectOption(theme);
