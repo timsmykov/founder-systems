@@ -14,15 +14,15 @@ Both display portraits use AI-assisted background removal and a tight head-and-s
 
 ## Upcoming founder portraits
 
-These previews are adaptations of the following photographs. Backgrounds were removed with AI assistance and images may be cropped for display; no endorsement is implied.
+These previews use the photographs listed below. Display images may be cropped and most use AI-assisted background removal; no endorsement is implied.
 
 - **Steve Jobs:** photograph by Matthew Yohe, crop by MetalGearLiquid, [source](https://commons.wikimedia.org/wiki/File:Steve_Jobs_Headshot_2010-CROP2.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). The adapted portrait is also offered under CC BY-SA 3.0.
-- **Jensen Huang:** photograph by Peter Dasilva, © European Union, [source](https://commons.wikimedia.org/wiki/File:Jensen_Huang_(cropped)_(2024).jpg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-- **Dario Amodei:** Simon Walker / No 10 Downing Street, UK Prime Minister, [source](https://commons.wikimedia.org/wiki/File:Dario_Amodei_in_2023.jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
-- **Jeff Bezos:** U.S. Department of Defense photograph by Senior Master Sgt. Adrian Cadiz, crop by Simon Horn, [source](https://commons.wikimedia.org/wiki/File:Jeff_Bezos_2016.jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- **Jensen Huang:** photograph by Anderseidesvik, [source](https://commons.wikimedia.org/wiki/File:Jensen_huang_stanford_2026-04-30_010.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The adapted portrait is also offered under CC BY-SA 4.0.
+- **Dario Amodei:** [Anthropic leadership portrait](https://www.anthropic.com/company/leadership); photographer and licence not identified. AI-assisted background removal and cropping; rights are not represented as open-licensed.
+- **Jeff Bezos:** photograph provided by the project owner; photographer and source not identified. The owner confirmed permission for this project. Cropped for display.
 - **Patrick Collison:** photograph by JD Lasica, [source](https://commons.wikimedia.org/wiki/File:Patrick_Collison_(cropped).jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
-- **Peter Thiel:** photograph by Dan Taylor / Heisenberg Media, [source](https://commons.wikimedia.org/wiki/File:Peter_Thiel_(2014).jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
-- **Garry Tan:** photograph by Web Summit, [source](https://commons.wikimedia.org/wiki/File:Garry_Tan,_Web_Summit_2018,_November_6_SD5_6949_(45700698642)(portrait_4x3_crop).jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- **Peter Thiel:** [Founders Fund portrait](https://foundersfund.com/team/peter-thiel/); photographer and licence not identified. AI-assisted background removal and cropping; rights are not represented as open-licensed.
+- **Garry Tan:** photograph provided by the project owner; photographer and source not identified. The owner confirmed permission for this project. AI-assisted background removal and cropping.
 - **Daniel Ek:** photograph by Lukasz Kobus / European Commission, © European Union, [source](https://commons.wikimedia.org/wiki/File:Daniel_Ek_EC_2025.jpg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - **Tobi Lütke:** photograph by Benjamin Forrest, [source](https://commons.wikimedia.org/wiki/File:NYC-Commerce-Tobi-L%C3%BCtki-561.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The adapted portrait is also offered under CC BY-SA 4.0.
-- **Paul Graham:** photograph by TechCrunch, [source](https://commons.wikimedia.org/wiki/File:Paul_Graham_and_Ashton_Kutcher_attend_TechCrunch_Disrupt_New_York_May_2011.jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- **Paul Graham:** photograph by Dave Thomas, [source and attribution notice](https://paulgraham.com/bio.html); Creative Commons Attribution, version not specified on the source page. AI-assisted background removal and cropping.
