@@ -1,10 +1,10 @@
 # Founder Systems
 
-A source-backed map of how founders build and operate companies. The first collection compares **Nik Storonsky / QuantumLight** with **Elon Musk as represented in Eric Jorgenson's The Book of Elon**.
+An interactive, source-backed research library for exploring how founders build and operate companies. Start with a topic, follow a meaning to its original quotations, and compare mechanisms without losing their context. The first collection brings together **Nik Storonsky / QuantumLight** and **Elon Musk as represented in Eric Jorgenson's The Book of Elon**.
+
+[Open the interactive library](https://founder-systems.timsmykov.chatgpt.site/) · [Read the case study](docs/case-study.md) · [Explore the methodology](docs/methodology.md).
 
 Explore **793 meanings, 3,822 detailed facets and 257 comparison groups**, including 25 same-mechanism groups. All **5,138 original quotation records** remain included; 4,499 are attached to meaning cards and the remainder preserves audit/context evidence. The project name accommodates future founders; the current interface/data model still targets this first pair.
-
-[Open the interactive library](https://founder-systems.timsmykov.chatgpt.site/)
 
 ![Founder Systems interactive library](assets/portfolio-preview.png)
 
