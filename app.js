@@ -82,7 +82,7 @@ function syncControls(){
   document.querySelector('.author-filter').hidden=s.view==='comparisons';
   $('content').classList.toggle('graph-mode',s.view==='graph');$('content').classList.toggle('has-selection',!!s.selected);
   ['graph-intro','graph-tools','graph-legend'].forEach(id=>$(id).hidden=s.view!=='graph');
-  document.querySelector('#graph-intro p').textContent=phone()?'A sample of matching comparisons. Tap a point to preview; use Ideas for a list.':'A sample of matching comparisons. Select a point; use Ideas for a list.';
+  document.querySelector('#graph-intro p').textContent=phone()?'Connections include related ideas from both sources. Tap a point to preview; use Ideas for a list.':'Connections include related ideas from both sources. Select a point; use Ideas for a list.';
   $('graph-focus').disabled=!s.selected||s.kind!=='meaning';$('graph-focus').textContent=focusGraph?'Show full view':'Focus selected idea';
   const active=Number(s.author!=='all')+Number(s.filter!=='all');
   $('filter-badge').hidden=!active;$('filter-badge').textContent=active;
@@ -181,7 +181,10 @@ async function renderRelation(id,token){
   await Promise.all(['nik','elon'].map(side=>showQuotes(r.decisions.flatMap(x=>x[side].flatMap(e=>e.evidence_keys)),`relation-${side}-quotes`,{limit:2})));
 }
 function renderGraph(items){
-  let nodes=items;let ids=new Set(nodes.map(c=>c.id));let rs=relations.filter(r=>r.endpoint_ids.every(id=>ids.has(id)));
+  const matchingIds=new Set(items.map(c=>c.id));
+  let rs=relations.filter(r=>r.endpoint_ids.some(id=>matchingIds.has(id)));
+  let ids=new Set([...matchingIds,...rs.flatMap(r=>r.endpoint_ids)]);
+  let nodes=cards.filter(c=>ids.has(c.id));
   if(focusGraph&&s.kind==='meaning'&&s.selected){rs=relations.filter(r=>r.endpoint_ids.includes(s.selected));ids=new Set([s.selected,...rs.flatMap(r=>r.endpoint_ids)]);nodes=cards.filter(c=>ids.has(c.id));}
   const available=rs.length; if(!fullGraph&&!focusGraph&&rs.length>12){rs=rs.slice(0,12);ids=new Set(rs.flatMap(r=>r.endpoint_ids));nodes=nodes.filter(c=>ids.has(c.id));}
   $('graph-scope').textContent=fullGraph?'Show a smaller map':`Show all ${available} comparisons`; $('graph-scope').hidden=available<=12&&!fullGraph;
