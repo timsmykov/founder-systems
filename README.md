@@ -16,7 +16,7 @@ The question behind the project is practical: how can you explore recurring comp
 
 Start with a topic or search, open a meaning card to inspect its quotations, then use the graph and comparison groups to explore related ideas. The public application runs entirely in the browser. This is an exploratory research product, not a validated theory of company performance or an endorsement of any founder's conduct.
 
-Read the [product case study](docs/case-study.md) for the design decisions and evidence boundaries.
+Read the [product case study](docs/case-study.md) for the design decisions and evidence boundaries. Explore [Founder Lenses](https://github.com/timsmykov/founder-lenses) for source-aware agent skills derived from this research.
 
 ## Run locally
 
