@@ -6,3 +6,7 @@
 - This is the public quoted library. Do not add raw EPUBs, complete source transcripts, credentials, browser state or native worker execution packets.
 - Run `python3 scripts/verify.py` after data changes. Check substantive interface changes in a browser, including phone navigation and both themes.
 - Submit changes through a pull request. Do not rewrite accepted history or change access settings without an explicit owner instruction.
+
+## Independence from private development
+
+This is an independent public snapshot. Edit only this checkout for portfolio work. Never add private source dependencies, synchronization hooks, internal deployment targets or credentials. Private changes do not authorize publication; select and review each outgoing snapshot explicitly. Do not change the original product to satisfy this edition.
