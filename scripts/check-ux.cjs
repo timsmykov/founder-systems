@@ -38,6 +38,20 @@ module.exports = async function checkUX(page, base) {
   assert(await page.locator('#graph-legend').isVisible());
   await page.locator('#graph-scope').click();
   assert.match(await page.locator('#result-count').innerText(), /257 of 257 comparisons/);
+  // A one-source filter must retain reviewed cross-source comparisons and
+  // display the counterpart endpoints, without inventing relationships.
+  await page.goto(new URL('#v=graph&a=nik', base).href);
+  await page.waitForFunction(() => window.atlas?.quoteSearchReady, {timeout:60000});
+  const graph = await page.evaluate(() => {
+    const matching = new Set(atlas.filtered().map(c => c.id));
+    const hubs = [...document.querySelectorAll('[data-hub]')].map(n => atlas.relations.get(n.dataset.hub));
+    const displayed = new Set([...document.querySelectorAll('[data-node]')].map(n => n.dataset.node));
+    return {count: hubs.length, valid: hubs.every(r => r.endpoint_ids.some(id => matching.has(id)) && r.endpoint_ids.every(id => displayed.has(id))),
+      hasCounterpart: [...displayed].some(id => atlas.cards.get(id).side === 'elon')};
+  });
+  assert(graph.count > 0 && graph.valid && graph.hasCounterpart, 'Source filter lost or changed graph connections');
+  await page.goto(base);
+  await page.waitForFunction(() => window.atlas?.quoteSearchReady, {timeout:60000});
   await page.locator('#meanings-tab').click();
   await page.locator('details.upcoming-founder summary').click();
   assert.equal(await page.locator('.upcoming-founder img[src]').count(),10);
